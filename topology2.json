@@ -1,9 +1,9 @@
 {
-  "id": "top1",
+  "id": "top2",
   "components": [
     {
       "type": "resistor",
-      "id": "res1",
+      "id": "res2",
       "resistance": {
         "default": 100,
         "min": 10,
@@ -17,7 +17,7 @@
     },
     {
       "type": "nmos",
-      "id": "m1",
+      "id": "m2",
       "m(l)": {
         "default": 1.5,
         "min": 1,
