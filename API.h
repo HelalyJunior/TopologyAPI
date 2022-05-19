@@ -5,9 +5,11 @@
 #include <map>
 #include <memory>
 #include <fstream>
-#include "json.hpp"
+#include "JSON_LIBRARY/json.hpp"
 using json = nlohmann::json;
 
+#ifndef API_H
+#define API_H
 
 class Component
 {
@@ -21,6 +23,13 @@ class Component
         float max;
 
     public:
+        bool operator==(const Component& component)
+        {
+            if(id.compare(component.id)==0 && netlistId==component.netlistId && internal_name.compare(component.internal_name)==0 &&
+            type.compare(component.type)==0&& defaultt==component.defaultt && min==component.min && max==component.max)
+                return true;
+            return false;
+        }
 
     int getNetListId()
     {
@@ -109,6 +118,15 @@ class Resistor:public Component
             netlist= std::make_shared<Resistnace_netlist>();
         }
 
+        bool operator==(const Resistor& resistor)
+        {
+            bool first = Component::operator==(*this);
+            if(first && (netlist->t1).compare(resistor.netlist->t1)==0 &&(netlist->t2).compare(resistor.netlist->t2)==0)
+                return true;
+            return false;
+        }
+
+
         std::string getT1()
         {
             return netlist->t1;
@@ -149,7 +167,15 @@ class Nmos:public Component
         {
             netlist=std::make_shared<Nmos_netlist>();
         }
-        
+
+        bool operator==(const Nmos& nmos)
+        {
+            bool first = Component::operator==(*this);
+            if(first && (netlist->drain).compare(nmos.netlist->drain)==0 &&(netlist->source).compare(nmos.netlist->source)==0 &&
+            (netlist->gate).compare(nmos.netlist->gate)==0)
+                return true;
+            return false;
+        }
 
         void setNetlist(std::vector<std::string>& values)
         {
@@ -202,6 +228,22 @@ class Topology
 
     public:
 
+        bool operator==(const Topology& topology)
+        {
+            if(id!=topology.id)
+                return false;
+            if(components.size()!=topology.components.size())
+                return false;
+
+            for(int i=0;i<components.size();i++)
+            {
+                std::cout << components[i]->getInternalName() << "  " << topology.components[i]->getInternalName() << std::endl;
+                if(!((*(components[i]))==(*(topology.components[i]))))
+                    return false;
+            }
+            return true;
+        }
+
         std::string getId()
         {
             return id;
@@ -249,11 +291,20 @@ class TopologyAPI
 
         bool readJSON(std::string fileName)
         {
-            std::ifstream i(fileName + ".json");
-            json j;
-            i >> j;
-            saveToMemory(j);
-            return true;
+            try
+            {
+                std::ifstream i(fileName + ".json");
+                json j;
+                i >> j;
+                saveToMemory(j);
+                return true;
+            }
+            catch(const std::exception& e)
+            {
+                throw std::invalid_argument("Either The file is inalid JSON syntax or No file exists of that name!");
+            }
+            
+
         }
 
         std::vector<Topology>& queryTopologies()
@@ -286,7 +337,7 @@ class TopologyAPI
                     return (*topologies)[i].getComponents();
                 }
             }
-            throw std::invalid_argument("Query is Invalid !");
+            throw std::invalid_argument("There's no toplogy of that id exists on the memory!");
         }
 
         std::vector<std::shared_ptr<Component>> queryDevicesWithNetListNode(std::string toplogyId
@@ -298,57 +349,66 @@ class TopologyAPI
                 if(devices[i]->getNetListId()!=netListId)
                 {
                     devices.erase(devices.begin()+i);
-                    return devices;
                 }
             }
-            throw std::invalid_argument("Query is Invalid !");
+            if(devices.size()==0)
+                throw std::invalid_argument("There's no Netlist of that id exists on the memory!");
+            return devices;
         }
 
-        void writeJSON(std::string id)
+        void writeJSON(std::string id,std::string path)
         {
-            Topology topology;
-            for(int i=0;i<topologies->size();i++)
+            try
             {
-                if((*topologies)[i].getId().compare(id)==0)
+                Topology topology;
+                for(int i=0;i<topologies->size();i++)
                 {
-                    topology=(*topologies)[i];
+                    if((*topologies)[i].getId().compare(id)==0)
+                    {
+                        topology=(*topologies)[i];
+                    }
                 }
+                json t_map;
+                t_map["id"]=topology.getId();
+                std::ofstream file(path + ".json");
+                std::list<json> components;
+                for(auto component : topology.getComponents())
+                {
+                    json c_map;
+                    c_map["id"]=component->getId();
+                    c_map["type"]=component->getType();
+                    json limits;
+                    limits["default"]=component->getDefaultt();
+                    limits["min"]=component->getMin();
+                    limits["max"]=component->getMax();
+                    c_map[component->getInternalName()]=limits;
+                    limits.clear();
+                    limits["id"]=component->getNetListId();
+                    if(component->getType()=="resistor")
+                    {
+                        Resistor r = static_cast<Resistor&>(*component);
+                        limits["t1"]=r.getT1();
+                        limits["t2"]=r.getT2();
+                    }
+                    else if (component->getType()=="nmos")
+                    {
+                        Nmos n = static_cast<Nmos&>(*component);
+                        limits["drain"]=n.getDrain();
+                        limits["gate"]=n.getGate();
+                        limits["source"]=n.getSource();
+                    }
+                    c_map["netlist"]=limits;
+                    components.push_back(c_map);
+                }
+                t_map["components"]=components;
+                file << t_map;
             }
-            json t_map;
-            t_map["id"]=topology.getId();
-            std::ofstream file(topology.getId()+".json");
-            std::list<json> components;
-            for(auto component : topology.getComponents())
+            catch(const std::exception& e)
             {
-                json c_map;
-                c_map["id"]=component->getId();
-                c_map["type"]=component->getType();
-                json limits;
-                limits["default"]=component->getDefaultt();
-                limits["min"]=component->getMin();
-                limits["max"]=component->getMax();
-                c_map[component->getInternalName()]=limits;
-                limits.clear();
-                limits["id"]=component->getNetListId();
-                if(component->getType()=="resistor")
-                {
-                    Resistor r = static_cast<Resistor&>(*component);
-                    limits["t1"]=r.getT1();
-                    limits["t2"]=r.getT2();
-                }
-                else if (component->getType()=="nmos")
-                {
-                    Nmos n = static_cast<Nmos&>(*component);
-                    limits["drain"]=n.getDrain();
-                    limits["gate"]=n.getGate();
-                    limits["source"]=n.getSource();
-                }
-                c_map["netlist"]=limits;
-                components.push_back(c_map);
+                throw std::invalid_argument("There's no Topology of that id exists on the memory!");
             }
-            t_map["components"]=components;
-
-            file << t_map;
+            
+            
         }
     
     private:
@@ -424,57 +484,4 @@ void showComponents(std::vector<std::shared_ptr<Component>>& components)
 
 }
 
-int main()
-{
-    TopologyAPI API ;
-    /*
-    * READ 'top1','top2','top3'
-    */
-    API.readJSON("topology");
-    API.readJSON("topology2");
-    API.readJSON("topology3");
-
-    /*
-    * QUERY ALL THE TOPOLOGIES ON MEMORY
-    */
-    std::vector<Topology> topologies = API.queryTopologies();
-    showTopologies(topologies);
-
-    /*
-    *QUERY ALL THE DEVICES IN 'top3'
-    */
-    auto devices = API.queryDevices("top3");
-    showComponents(devices);
-
-   /*
-   *QUERY THE DEVICES IN 'top3' AND NODE 2
-   */
-    auto selectedDevices = API.queryDevicesWithNetListNode("top3",2);
-    showComponents(selectedDevices);
-
-    /*
-    * DELETE top1,top3
-    */
-    API.deleteTopology("top1");
-    API.deleteTopology("top3");
-
-    /*
-    * QUERY ALL THE DEVICES LEFT ON MEMORY ('top2')
-    */
-    std::vector<Topology> topologies2 = API.queryTopologies();
-    showTopologies(topologies2);
-
-    /*
-    * WRITE 'top2' TO DISK , DELETE IT FROM MEMORY
-    * THEN READ IT FROM DISK
-    */
-    API.writeJSON("top2");
-    API.deleteTopology("top2");
-    API.readJSON("top2");
-
-    /*
-    * QUERY ALL THE DEVICES LEFT ON MEMORY ('top2')
-    */
-    std::vector<Topology> topologies3 = API.queryTopologies();
-    showTopologies(topologies2);
-}
+#endif
