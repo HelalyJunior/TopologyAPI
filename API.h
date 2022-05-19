@@ -289,11 +289,11 @@ class TopologyAPI
             topologies = std::make_shared<std::vector<Topology>>();
         }
 
-        bool readJSON(std::string fileName)
+        bool readJSON(std::string path)
         {
             try
             {
-                std::ifstream i(fileName + ".json");
+                std::ifstream i(path + ".json");
                 json j;
                 i >> j;
                 saveToMemory(j);
