@@ -19,6 +19,7 @@ The library Provides the functionality to **access**, **manage** and **store** d
 	- *Visual Studio Code* / *Visual Studio 2019* as ***IDE***
 	- *Microsoft Code Analysis tool* for ***testing***
 	- *nlohmann-json* which is a library that help parsing ***JSON*** files
+	- *Visual Studio* to analyze the code for potential problems
 	 - *Visual Paradigm Online* to create the ***class diagram***
 ## Why C++?
 **C++** is a powerful general-purpose programming language. It can be used to develop different  types of application such as games , **APIs** and so on. **C++** also supports writing the code in different paradigms including functional programming and **object-oriented programming** which makes it very powerful and extremely flexible and that's the reason **C++** is my go-to language.
