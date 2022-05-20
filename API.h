@@ -459,29 +459,5 @@ class TopologyAPI
 };
 
 
-/*
-* Helper Function to print the topologies
-*/
-void showTopologies(std::vector<Topology>& topologies)
-{
-    for(int i=0;i<topologies.size();i++)
-    {
-        topologies[i].print();
-    }
-    std::cout<<std::endl;
-}
-
-/*
-* Helper Function to print the Devices/components
-*/
-void showComponents(std::vector<std::shared_ptr<Component>>& components)
-{
-   for(auto d : components)
-   {
-       d->print();
-   }
-    std::cout<<"_________________________________"<<std::endl;
-
-}
 
 #endif
