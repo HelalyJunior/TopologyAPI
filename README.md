@@ -12,15 +12,14 @@ The library Provides the functionality to **access**, **manage** and **store** d
     2. Write topology into a ***JSON*** file and store it on the disk.
     3. Query the list of topologies stored in memory.
     4. Query the devices of a certain topology given an id.
-    5. Query the devices that are connected to each other through a given node in a 		 certain topology.
+    5. Query the devices that are connected to each other through a given node in a certain topology.
     6. Delete  a topology from memory given an id.
 ## Development
 - During Development I used : 
-  1 - *Visual Studio Code* / *Visual Studio 2019* as ***IDE***
-  2 - *Microsoft Code Analysis tool* for ***testing***
-  3 - *nlohmann-json* which is a library that help parsing ***JSON*** files
-  4 - *Visual Paradigm Online* to create the ***class diagram***
-
+	- *Visual Studio Code* / *Visual Studio 2019* as ***IDE***
+	- *Microsoft Code Analysis tool* for ***testing***
+	- *nlohmann-json* which is a library that help parsing ***JSON*** files
+	 - *Visual Paradigm Online* to create the ***class diagram***
 ## Why C++?
 **C++** is a powerful general-purpose programming language. It can be used to develop different  types of application such as games , **APIs** and so on. **C++** also supports writing the code in different paradigms including functional programming and **object-oriented programming** which makes it very powerful and extremely flexible and that's the reason **C++** is my go-to language.
 
