@@ -17,7 +17,7 @@ The library Provides the functionality to **access**, **manage** and **store** d
 ## Development
 - During Development I used : 
 	- *Visual Studio Code* / *Visual Studio 2019* as ***IDE***
-	- *Microsoft Code Analysis tool* for ***testing***
+	- *Microsoft Unit Testing Framework for C++* for ***testing***
 	- *nlohmann-json* which is a library that help parsing ***JSON*** files
 	- *Visual Studio* to analyze the code for potential problems
 	 - *Visual Paradigm Online* to create the ***class diagram***
@@ -116,7 +116,7 @@ Here will be a detailed explanation on each function provided by the **API** and
 ## Testing
 Test cases can be seen from [here](https://github.com/HelalyJunior/TopologyAPI/blob/main/API_TESTING/API_Testing.cpp)
 
-*Microsoft's Code Analysis* tool was used to automatically test the **API**.
+*Microsoft Unit Testing Framework for C++* tool was used to automatically test the **API**.
 ![alt text](https://github.com/HelalyJunior/TopologyAPI/blob/main/IMAGES/Tests.png)
 
 ## How to use the API?
